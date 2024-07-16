@@ -155,7 +155,9 @@ export type AnyMediaMessageContent = (
         fileName?: string
         caption?: string
     } & Contextable & Buttonable & Templatable))
-    | ListMessage  // Adicionando ListMessage aqui
+    | {
+        listMessage: ListMessage // Ensure ListMessage is included
+    }  // Adicionando ListMessage aqui
     & { mimetype?: string } & Editable
 
 
@@ -195,7 +197,9 @@ export type AnyRegularMessageContent = (
     }
     | {
         listReply: Omit<proto.Message.IListResponseMessage, 'contextInfo'>
-    } | ListMessage  // Ensure ListMessage is included
+    } | {
+        listMessage: ListMessage // Ensure ListMessage is included
+    }  // Ensure ListMessage is included
     | {
         product: WASendableProduct
         businessOwnerJid?: string
