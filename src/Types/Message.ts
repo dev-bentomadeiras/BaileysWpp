@@ -58,6 +58,7 @@ interface ListMessage {
     contextInfo?: proto.IContextInfo;
 }
 
+
 // types to generate WA messages
 type Mentionable = {
     /** list of jids that are mentioned in the accompanying text */

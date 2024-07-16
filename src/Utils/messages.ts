@@ -375,7 +375,9 @@ export const generateWAMessageContent = async(
 		}
 	} else if('location' in message) {
 		m.locationMessage = WAProto.Message.LocationMessage.fromObject(message.location)
-	} else if('react' in message) {
+	} else if ('listMessage' in message) {
+        m.listMessage = message.listMessage
+    } else if('react' in message) {
 		if(!message.react.senderTimestampMs) {
 			message.react.senderTimestampMs = Date.now()
 		}
