@@ -2,7 +2,6 @@ import { AxiosRequestConfig } from 'axios'
 import type { Logger } from 'pino'
 import type { Readable } from 'stream'
 import type { URL } from 'url'
-import { proto } from '../../WAProto'
 import { MEDIA_HKDF_KEY_MAPPING } from '../Defaults'
 import type { GroupMetadata } from './GroupMetadata'
 import { CacheStore } from './Socket'
@@ -82,6 +81,8 @@ type Listable = {
   
     /** ListType of the List */
     listType?: proto.Message.ListMessage.ListType
+
+    sections: proto.Message.ListMessage.ISection[];
   }
   
   type WithDimensions = {
