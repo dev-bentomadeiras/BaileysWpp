@@ -527,17 +527,14 @@ export const generateWAMessageContent = async(
     }
 
     if ('sections' in message && !!message.sections) {
-        const listType = message.hasOwnProperty("listType") ? message.listType : proto.Message.ListMessage.ListType.PRODUCT_LIST
-        const listMessage: proto.Message.IListMessage = {
-            sections: message.sections,
-            buttonText: message.buttonText,
-            title: message.title,
-            footerText: message.footer,
-            description: message.description,
-            listType: listType
-        }
-
-        m = { listMessage }
+		const listType = message.hasOwnProperty("listType") ? message.listType : proto.Message.ListMessage.ListType.PRODUCT_LIST
+		const listMessage: proto.Message.IListMessage = {
+			sections: message.sections,
+			buttonText: message.buttonText,
+			title: message.title,
+			listType: listType
+		}
+		m = { listMessage }
     }
 
     if ('viewOnce' in message && !!message.viewOnce) {

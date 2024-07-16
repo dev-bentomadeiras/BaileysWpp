@@ -54,9 +54,10 @@ interface ListMessage {
     listType?: proto.Message.ListMessage.ListType;
     sections?: proto.Message.ListMessage.ISection[];
     productListInfo?: proto.Message.ListMessage.IProductListInfo;
-    footerText?: string;
+    footerText?: string;  // Assegure-se de que footerText esteja incluído aqui
     contextInfo?: proto.IContextInfo;
 }
+
 
 
 // types to generate WA messages
