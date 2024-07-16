@@ -699,44 +699,77 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 			return message
 		},
-		const sendMessage = async (
-			jid,
-			content,
-			options = {}
+		sendMessage: async(
+			jid: string,
+			content: AnyMessageContent,
+			options: MiscMessageGenerationOptions = { }
 		) => {
-			const userJid = authState.creds.me.id;
-			const fullMsg = await generateWAMessage(
-				jid,
-				content,
-				{
-					logger,
-					userJid,
-					upload: waUploadToServer,
-					mediaCache: config.mediaCache,
-					...options,
+			const userJid = authState.creds.me!.id
+			if(
+				typeof content === 'object' &&
+				'disappearingMessagesInChat' in content &&
+				typeof content['disappearingMessagesInChat'] !== 'undefined' &&
+				isJidGroup(jid)
+			) {
+				const { disappearingMessagesInChat } = content
+				const value = typeof disappearingMessagesInChat === 'boolean' ?
+					(disappearingMessagesInChat ? WA_DEFAULT_EPHEMERAL : 0) :
+					disappearingMessagesInChat
+				await groupToggleEphemeral(jid, value)
+			} else {
+				const fullMsg = await generateWAMessage(
+					jid,
+					content,
+					{
+						logger,
+						userJid,
+						getUrlInfo: text => getUrlInfo(
+							text,
+							{
+								thumbnailWidth: linkPreviewImageThumbnailWidth,
+								fetchOpts: {
+									timeout: 3_000,
+									...axiosOptions || { }
+								},
+								logger,
+								uploadImage: generateHighQualityLinkPreview
+									? waUploadToServer
+									: undefined
+							},
+						),
+						upload: waUploadToServer,
+						mediaCache: config.mediaCache,
+						options: config.options,
+						messageId: generateMessageIDV2(sock.user?.id),
+						...options,
+					}
+				)
+				const isDeleteMsg = 'delete' in content && !!content.delete
+				const isEditMsg = 'edit' in content && !!content.edit
+				const additionalAttributes: BinaryNodeAttributes = { }
+				// required for delete
+				if(isDeleteMsg) {
+					// if the chat is a group, and I am not the author, then delete the message as an admin
+					if(isJidGroup(content.delete?.remoteJid as string) && !content.delete?.fromMe) {
+						additionalAttributes.edit = '8'
+					} else {
+						additionalAttributes.edit = '7'
+					}
+				} else if(isEditMsg) {
+					additionalAttributes.edit = '1'
 				}
-			);
-			const isDeleteMsg = 'delete' in content && !!content.delete;
-			const additionalAttributes = {};
-			if (isDeleteMsg) {
-				additionalAttributes.edit = '7';
+
+				await relayMessage(jid, fullMsg.message!, { messageId: fullMsg.key.id!, cachedGroupMetadata: options.cachedGroupMetadata, additionalAttributes, statusJidList: options.statusJidList })
+				if(config.emitOwnEvents) {
+					process.nextTick(() => {
+						processingMutex.mutex(() => (
+							upsertMessage(fullMsg, 'append')
+						))
+					})
+				}
+
+				return fullMsg
 			}
-			
-			// Adicionando suporte para mensagens de lista
-			if (content.listMessage) {
-				additionalAttributes.type = 'list';
-			}
-		
-			await relayMessage(jid, fullMsg.message, { messageId: fullMsg.key.id, additionalAttributes });
-			if (config.emitOwnEvents) {
-				process.nextTick(() => {
-					processingMutex.mutex(() => (
-						upsertMessage(fullMsg, 'append')
-					));
-				});
-			}
-			return fullMsg;
 		}
-		
 	}
 }
