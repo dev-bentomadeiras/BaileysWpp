@@ -48,17 +48,15 @@ export interface WAUrlInfo {
 }
 
 interface ListMessage {
-    title?: string;
-    description?: string;
-    buttonText?: string;
-    listType?: proto.Message.ListMessage.ListType;
-    sections?: proto.Message.ListMessage.ISection[];
-    productListInfo?: proto.Message.ListMessage.IProductListInfo;
-    footerText?: string;  // Assegure-se de que footerText esteja incluído aqui
-    contextInfo?: proto.IContextInfo;
+    title?: string | null;
+    description?: string | null;
+    buttonText?: string | null;
+    listType?: proto.Message.ListMessage.ListType | null;
+    sections?: proto.Message.ListMessage.ISection[] | null;
+    productListInfo?: proto.Message.ListMessage.IProductListInfo | null;
+    footerText?: string | null;
+    contextInfo?: proto.IContextInfo | null;
 }
-
-
 
 // types to generate WA messages
 type Mentionable = {
@@ -157,7 +155,7 @@ export type AnyMediaMessageContent = (
         fileName?: string
         caption?: string
     } & Contextable & Buttonable & Templatable))
-    | ListMessage // Adicionando ListMessage aqui
+    | ListMessage  // Adicionando ListMessage aqui
     & { mimetype?: string } & Editable
 
 
