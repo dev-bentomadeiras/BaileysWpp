@@ -98,7 +98,13 @@ type Listable = {
 
     /** ListType of the List */
     listType?: proto.Message.ListMessage.ListType
+
+    /** Footer text of the List */
+    footerText?: string
+
+    description?: string
 }
+
 type WithDimensions = {
     width?: number
     height?: number
@@ -167,7 +173,7 @@ export type WASendableProduct = Omit<proto.Message.ProductMessage.IProductSnapsh
 
 export type AnyRegularMessageContent = (
     ({
-	    text: string
+        text: string
         linkPreview?: WAUrlInfo | null
     }
     & Mentionable & Contextable & Buttonable & Templatable & Listable & Editable)
@@ -191,7 +197,7 @@ export type AnyRegularMessageContent = (
     }
     | {
         listReply: Omit<proto.Message.IListResponseMessage, 'contextInfo'>
-    } | ListMessage // Adicionando suporte para ListMessage
+    } | ListMessage  // Ensure ListMessage is included
     | {
         product: WASendableProduct
         businessOwnerJid?: string
@@ -201,13 +207,13 @@ export type AnyRegularMessageContent = (
 ) & ViewOnce
 
 export type AnyMessageContent = AnyRegularMessageContent | {
-	forward: WAMessage
-	force?: boolean
+    forward: WAMessage
+    force?: boolean
 } | {
     /** Delete your message or anyone's message in a group (admin required) */
-	delete: WAMessageKey
+    delete: WAMessageKey
 } | {
-	disappearingMessagesInChat: boolean | number
+    disappearingMessagesInChat: boolean | number
 }
 
 export type GroupMetadataParticipants = Pick<GroupMetadata, 'participants'>

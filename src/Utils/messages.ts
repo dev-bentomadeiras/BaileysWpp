@@ -532,8 +532,8 @@ export const generateWAMessageContent = async(
         sections: message.sections,
         buttonText: message.buttonText,
         title: message.title,
-        footerText: "",  // Usando footerText de ListMessage
-        description: "",  // Usando description de ListMessage
+        footerText: message.footerText,  // Usando footerText de ListMessage
+        description: message.description,  // Usando description de ListMessage
         listType: listType
     };
 		m = { listMessage }
