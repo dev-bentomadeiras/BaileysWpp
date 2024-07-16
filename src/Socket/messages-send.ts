@@ -754,7 +754,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						upload: waUploadToServer,
 						mediaCache: config.mediaCache,
 						options: config.options,
-						messageId: generateMessageIDV2(sock.user?.id),
 						...options,
 					}
 				)

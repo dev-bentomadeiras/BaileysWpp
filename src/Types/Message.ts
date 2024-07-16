@@ -47,17 +47,6 @@ export interface WAUrlInfo {
     originalThumbnailUrl?: string
 }
 
-interface ListMessage {
-    title?: string | null;
-    description?: string | null;
-    buttonText?: string | null;
-    listType?: proto.Message.ListMessage.ListType | null;
-    sections?: proto.Message.ListMessage.ISection[] | null;
-    productListInfo?: proto.Message.ListMessage.IProductListInfo | null;
-    footerText?: string | null;
-    contextInfo?: proto.IContextInfo | null;
-}
-
 // types to generate WA messages
 type Mentionable = {
     /** list of jids that are mentioned in the accompanying text */
@@ -91,17 +80,10 @@ type Listable = {
     /** Title of a List Message only */
     title?: string
 
-    /** Text of the button on the list (required) */
+    /** Text of the bnutton on the list (required) */
     buttonText?: string
-
-    /** ListType of the List */
-    listType?: proto.Message.ListMessage.ListType
-
-    /** Footer text of the List */
-    footerText?: string
-
-    description?: string
 }
+
 
 type WithDimensions = {
     width?: number
@@ -155,9 +137,8 @@ export type AnyMediaMessageContent = (
         fileName?: string
         caption?: string
     } & Contextable & Buttonable & Templatable))
-    | {
-        listMessage: ListMessage // Ensure ListMessage is included
-    }  // Adicionando ListMessage aqui
+    
+
     & { mimetype?: string } & Editable
 
 
@@ -197,9 +178,7 @@ export type AnyRegularMessageContent = (
     }
     | {
         listReply: Omit<proto.Message.IListResponseMessage, 'contextInfo'>
-    } | {
-        listMessage: ListMessage // Ensure ListMessage is included
-    }  // Ensure ListMessage is included
+    } 
     | {
         product: WASendableProduct
         businessOwnerJid?: string

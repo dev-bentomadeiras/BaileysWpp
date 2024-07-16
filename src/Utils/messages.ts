@@ -527,15 +527,14 @@ export const generateWAMessageContent = async(
     }
 
     if ('sections' in message && !!message.sections) {
-		const listType = message.hasOwnProperty("listType") ? message.listType : proto.Message.ListMessage.ListType.PRODUCT_LIST
 		const listMessage: proto.Message.IListMessage = {
         sections: message.sections,
         buttonText: message.buttonText,
         title: message.title,
-        footerText: message.footerText,  // Usando footerText de ListMessage
-        description: message.description,  // Usando description de ListMessage
-        listType: listType
-    };
+        footer: message.footer,  // Usando footerText de ListMessage
+        description: message.text,  // Usando teext de ListMessage
+        listType: proto.Message.ListMessage.ListType.SINGLE_SELECT
+    	}
 		m = { listMessage }
     }
 
@@ -580,8 +579,8 @@ export const generateWAMessageFromContent = (
 		options.timestamp = new Date()
 	}
 
-	const innerMessage = normalizeMessageContent(message)!
-	const key: string = getContentType(innerMessage)!
+	const key = Object.keys(message)[0]
+
 	const timestamp = unixTimestampSeconds(options.timestamp)
 	const { quoted, userJid } = options
 
@@ -598,7 +597,7 @@ export const generateWAMessageFromContent = (
 			delete quotedContent.contextInfo
 		}
 
-		const contextInfo: proto.IContextInfo = innerMessage[key].contextInfo || { }
+		const contextInfo: proto.IContextInfo = message[key].contextInfo || { }
 		contextInfo.participant = jidNormalizedUser(participant!)
 		contextInfo.stanzaId = quoted.key.id
 		contextInfo.quotedMessage = quotedMsg
@@ -609,7 +608,7 @@ export const generateWAMessageFromContent = (
 			contextInfo.remoteJid = quoted.key.remoteJid
 		}
 
-		innerMessage[key].contextInfo = contextInfo
+		message[key].contextInfo = contextInfo
 	}
 
 	if(
@@ -620,8 +619,8 @@ export const generateWAMessageFromContent = (
 		// already not converted to disappearing message
 		key !== 'ephemeralMessage'
 	) {
-		innerMessage[key].contextInfo = {
-			...(innerMessage[key].contextInfo || {}),
+		message[key].contextInfo = {
+			...(message[key].contextInfo || {}),
 			expiration: options.ephemeralExpiration || WA_DEFAULT_EPHEMERAL,
 			//ephemeralSettingTimestamp: options.ephemeralOptions.eph_setting_ts?.toString()
 		}
