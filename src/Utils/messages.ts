@@ -529,11 +529,13 @@ export const generateWAMessageContent = async(
     if ('sections' in message && !!message.sections) {
 		const listType = message.hasOwnProperty("listType") ? message.listType : proto.Message.ListMessage.ListType.PRODUCT_LIST
 		const listMessage: proto.Message.IListMessage = {
-			sections: message.sections,
-			buttonText: message.buttonText,
-			title: message.title,
-			listType: listType
-		}
+        sections: message.sections,
+        buttonText: message.buttonText,
+        title: message.title,
+        footerText: "",  // Usando footerText de ListMessage
+        description: "",  // Usando description de ListMessage
+        listType: listType
+    };
 		m = { listMessage }
     }
 
