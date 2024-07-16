@@ -321,253 +321,253 @@ export const generateForwardMessageContent = (
 }
 
 export const generateWAMessageContent = async(
-	message: AnyMessageContent,
-	options: MessageContentGenerationOptions
+    message: AnyMessageContent,
+    options: MessageContentGenerationOptions
 ) => {
-	let m: WAMessageContent = {}
-	if('text' in message) {
-		const extContent = { text: message.text } as WATextMessage
+    let m: WAMessageContent = {}
+    if ('text' in message) {
+        const extContent = { text: message.text } as WATextMessage
 
-		let urlInfo = message.linkPreview
-		if(typeof urlInfo === 'undefined') {
-			urlInfo = await generateLinkPreviewIfRequired(message.text, options.getUrlInfo, options.logger)
+        let urlInfo = message.linkPreview
+        if (typeof urlInfo === 'undefined') {
+            urlInfo = await generateLinkPreviewIfRequired(message.text, options.getUrlInfo, options.logger)
+        }
+
+        if (urlInfo) {
+            extContent.canonicalUrl = urlInfo['canonical-url']
+            extContent.matchedText = urlInfo['matched-text']
+            extContent.jpegThumbnail = urlInfo.jpegThumbnail
+            extContent.description = urlInfo.description
+            extContent.title = urlInfo.title
+            extContent.previewType = 0
+
+            const img = urlInfo.highQualityThumbnail
+            if (img) {
+                extContent.thumbnailDirectPath = img.directPath
+                extContent.mediaKey = img.mediaKey
+                extContent.mediaKeyTimestamp = img.mediaKeyTimestamp
+                extContent.thumbnailWidth = img.width
+                extContent.thumbnailHeight = img.height
+                extContent.thumbnailSha256 = img.fileSha256
+                extContent.thumbnailEncSha256 = img.fileEncSha256
+            }
+        }
+
+        if (options.backgroundColor) {
+            extContent.backgroundArgb = await assertColor(options.backgroundColor)
+        }
+
+        if (options.font) {
+            extContent.font = options.font
+        }
+
+        m.extendedTextMessage = extContent
+    } else if ('contacts' in message) {
+        const contactLen = message.contacts.contacts.length
+        if (!contactLen) {
+            throw new Boom('require atleast 1 contact', { statusCode: 400 })
+        }
+
+        if (contactLen === 1) {
+            m.contactMessage = WAProto.Message.ContactMessage.fromObject(message.contacts.contacts[0])
+        } else {
+            m.contactsArrayMessage = WAProto.Message.ContactsArrayMessage.fromObject(message.contacts)
+        }
+    } else if ('location' in message) {
+        m.locationMessage = WAProto.Message.LocationMessage.fromObject(message.location)
+    } else if ('listMessage' in message) {
+        m.listMessage = message.listMessage as proto.Message.IListMessage
+    } else if ('react' in message) {
+        if (!message.react.senderTimestampMs) {
+            message.react.senderTimestampMs = Date.now()
+        }
+
+        m.reactionMessage = WAProto.Message.ReactionMessage.fromObject(message.react)
+    } else if ('delete' in message) {
+        m.protocolMessage = {
+            key: message.delete,
+            type: WAProto.Message.ProtocolMessage.Type.REVOKE
+        }
+    } else if ('forward' in message) {
+        m = generateForwardMessageContent(
+            message.forward,
+            message.force
+        )
+    } else if ('disappearingMessagesInChat' in message) {
+        const exp = typeof message.disappearingMessagesInChat === 'boolean' ?
+            (message.disappearingMessagesInChat ? WA_DEFAULT_EPHEMERAL : 0) :
+            message.disappearingMessagesInChat
+        m = prepareDisappearingMessageSettingContent(exp)
+    } else if ('buttonReply' in message) {
+        switch (message.type) {
+            case 'template':
+                m.templateButtonReplyMessage = {
+                    selectedDisplayText: message.buttonReply.displayText,
+                    selectedId: message.buttonReply.id,
+                    selectedIndex: message.buttonReply.index,
+                }
+                break
+            case 'plain':
+                m.buttonsResponseMessage = {
+                    selectedButtonId: message.buttonReply.id,
+                    selectedDisplayText: message.buttonReply.displayText,
+                    type: proto.Message.ButtonsResponseMessage.Type.DISPLAY_TEXT,
+                }
+                break
+        }
+    } else if ('ptv' in message && message.ptv) {
+        const { videoMessage } = await prepareWAMessageMedia(
+            { video: message.video },
+            options
+        )
+        m.ptvMessage = videoMessage
+    } else if ('product' in message) {
+        const { imageMessage } = await prepareWAMessageMedia(
+            { image: message.product.productImage },
+            options
+        )
+        m.productMessage = WAProto.Message.ProductMessage.fromObject({
+            ...message,
+            product: {
+                ...message.product,
+                productImage: imageMessage,
+            }
+        })
+    } else if ('listReply' in message) {
+        m.listResponseMessage = { ...message.listReply }
+    } else if ('poll' in message) {
+        message.poll.selectableCount ||= 0
+
+        if (!Array.isArray(message.poll.values)) {
+            throw new Boom('Invalid poll values', { statusCode: 400 })
+        }
+
+        if (
+            message.poll.selectableCount < 0
+            || message.poll.selectableCount > message.poll.values.length
+        ) {
+            throw new Boom(
+                `poll.selectableCount in poll should be >= 0 and <= ${message.poll.values.length}`,
+                { statusCode: 400 }
+            )
+        }
+
+        m.messageContextInfo = {
+            // encKey
+            messageSecret: message.poll.messageSecret || randomBytes(32),
+        }
+
+        m.pollCreationMessage = {
+            name: message.poll.name,
+            selectableOptionsCount: message.poll.selectableCount,
+            options: message.poll.values.map(optionName => ({ optionName })),
+        }
+    } else if ('sharePhoneNumber' in message) {
+        m.protocolMessage = {
+            type: proto.Message.ProtocolMessage.Type.SHARE_PHONE_NUMBER
+        }
+    } else if ('requestPhoneNumber' in message) {
+        m.requestPhoneNumberMessage = {}
+    } else {
+        m = await prepareWAMessageMedia(
+            message,
+            options
+        )
+    }
+
+    if ('buttons' in message && !!message.buttons) {
+        const buttonsMessage: proto.Message.IButtonsMessage = {
+            buttons: message.buttons!.map(b => ({ ...b, type: proto.Message.ButtonsMessage.Button.Type.RESPONSE }))
+        }
+        if ('text' in message) {
+            buttonsMessage.contentText = message.text
+            buttonsMessage.headerType = ButtonType.EMPTY
+        } else {
+            if ('caption' in message) {
+                buttonsMessage.contentText = message.caption
+            }
+
+            const type = Object.keys(m)[0].replace('Message', '').toUpperCase()
+            buttonsMessage.headerType = ButtonType[type]
+
+            Object.assign(buttonsMessage, m)
+        }
+
+        if ('footer' in message && !!message.footer) {
+            buttonsMessage.footerText = message.footer
+        }
+
+        m = { buttonsMessage }
+    } else if ('templateButtons' in message && !!message.templateButtons) {
+        const msg: proto.Message.TemplateMessage.IHydratedFourRowTemplate = {
+            hydratedButtons: message.templateButtons
+        }
+
+        if ('text' in message) {
+            msg.hydratedContentText = message.text
+        } else {
+
+            if ('caption' in message) {
+                msg.hydratedContentText = message.caption
+            }
+
+            Object.assign(msg, m)
+        }
+
+        if ('footer' in message && !!message.footer) {
+            msg.hydratedFooterText = message.footer
 		}
 
-		if(urlInfo) {
-			extContent.canonicalUrl = urlInfo['canonical-url']
-			extContent.matchedText = urlInfo['matched-text']
-			extContent.jpegThumbnail = urlInfo.jpegThumbnail
-			extContent.description = urlInfo.description
-			extContent.title = urlInfo.title
-			extContent.previewType = 0
+        m = {
+            templateMessage: {
+                fourRowTemplate: msg,
+                hydratedTemplate: msg
+            }
+        }
+    }
 
-			const img = urlInfo.highQualityThumbnail
-			if(img) {
-				extContent.thumbnailDirectPath = img.directPath
-				extContent.mediaKey = img.mediaKey
-				extContent.mediaKeyTimestamp = img.mediaKeyTimestamp
-				extContent.thumbnailWidth = img.width
-				extContent.thumbnailHeight = img.height
-				extContent.thumbnailSha256 = img.fileSha256
-				extContent.thumbnailEncSha256 = img.fileEncSha256
-			}
-		}
+    if ('sections' in message && !!message.sections) {
+        const listType = message.hasOwnProperty("listType") ? message.listType : proto.Message.ListMessage.ListType.PRODUCT_LIST
+        const listMessage: proto.Message.IListMessage = {
+            sections: message.sections,
+            buttonText: message.buttonText,
+            title: message.title,
+            footerText: message.footer,
+            description: message.description,
+            listType: listType
+        }
 
-		if(options.backgroundColor) {
-			extContent.backgroundArgb = await assertColor(options.backgroundColor)
-		}
+        m = { listMessage }
+    }
 
-		if(options.font) {
-			extContent.font = options.font
-		}
+    if ('viewOnce' in message && !!message.viewOnce) {
+        m = { viewOnceMessage: { message: m } }
+    }
 
-		m.extendedTextMessage = extContent
-	} else if('contacts' in message) {
-		const contactLen = message.contacts.contacts.length
-		if(!contactLen) {
-			throw new Boom('require atleast 1 contact', { statusCode: 400 })
-		}
+    if ('mentions' in message && message.mentions?.length) {
+        const [messageType] = Object.keys(m)
+        m[messageType].contextInfo = m[messageType] || { }
+        m[messageType].contextInfo.mentionedJid = message.mentions
+    }
 
-		if(contactLen === 1) {
-			m.contactMessage = WAProto.Message.ContactMessage.fromObject(message.contacts.contacts[0])
-		} else {
-			m.contactsArrayMessage = WAProto.Message.ContactsArrayMessage.fromObject(message.contacts)
-		}
-	} else if('location' in message) {
-		m.locationMessage = WAProto.Message.LocationMessage.fromObject(message.location)
-	} else if ('listMessage' in message) {
-        m.listMessage = message.listMessage
-    } else if('react' in message) {
-		if(!message.react.senderTimestampMs) {
-			message.react.senderTimestampMs = Date.now()
-		}
+    if ('edit' in message) {
+        m = {
+            protocolMessage: {
+                key: message.edit,
+                editedMessage: m,
+                timestampMs: Date.now(),
+                type: WAProto.Message.ProtocolMessage.Type.MESSAGE_EDIT
+            }
+        }
+    }
 
-		m.reactionMessage = WAProto.Message.ReactionMessage.fromObject(message.react)
-	} else if('delete' in message) {
-		m.protocolMessage = {
-			key: message.delete,
-			type: WAProto.Message.ProtocolMessage.Type.REVOKE
-		}
-	} else if('forward' in message) {
-		m = generateForwardMessageContent(
-			message.forward,
-			message.force
-		)
-	} else if('disappearingMessagesInChat' in message) {
-		const exp = typeof message.disappearingMessagesInChat === 'boolean' ?
-			(message.disappearingMessagesInChat ? WA_DEFAULT_EPHEMERAL : 0) :
-			message.disappearingMessagesInChat
-		m = prepareDisappearingMessageSettingContent(exp)
-	} else if('buttonReply' in message) {
-		switch (message.type) {
-		case 'template':
-			m.templateButtonReplyMessage = {
-				selectedDisplayText: message.buttonReply.displayText,
-				selectedId: message.buttonReply.id,
-				selectedIndex: message.buttonReply.index,
-			}
-			break
-		case 'plain':
-			m.buttonsResponseMessage = {
-				selectedButtonId: message.buttonReply.id,
-				selectedDisplayText: message.buttonReply.displayText,
-				type: proto.Message.ButtonsResponseMessage.Type.DISPLAY_TEXT,
-			}
-			break
-		}
-	} else if('ptv' in message && message.ptv) {
-		const { videoMessage } = await prepareWAMessageMedia(
-			{ video: message.video },
-			options
-		)
-		m.ptvMessage = videoMessage
-	} else if('product' in message) {
-		const { imageMessage } = await prepareWAMessageMedia(
-			{ image: message.product.productImage },
-			options
-		)
-		m.productMessage = WAProto.Message.ProductMessage.fromObject({
-			...message,
-			product: {
-				...message.product,
-				productImage: imageMessage,
-			}
-		})
-	} else if('listReply' in message) {
-		m.listResponseMessage = { ...message.listReply }
-	} else if('poll' in message) {
-		message.poll.selectableCount ||= 0
+    if ('contextInfo' in message && !!message.contextInfo) {
+        const [messageType] = Object.keys(m)
+        m[messageType] = m[messageType] || {}
+        m[messageType].contextInfo = message.contextInfo
+    }
 
-		if(!Array.isArray(message.poll.values)) {
-			throw new Boom('Invalid poll values', { statusCode: 400 })
-		}
-
-		if(
-			message.poll.selectableCount < 0
-			|| message.poll.selectableCount > message.poll.values.length
-		) {
-			throw new Boom(
-				`poll.selectableCount in poll should be >= 0 and <= ${message.poll.values.length}`,
-				{ statusCode: 400 }
-			)
-		}
-
-		m.messageContextInfo = {
-			// encKey
-			messageSecret: message.poll.messageSecret || randomBytes(32),
-		}
-
-		m.pollCreationMessage = {
-			name: message.poll.name,
-			selectableOptionsCount: message.poll.selectableCount,
-			options: message.poll.values.map(optionName => ({ optionName })),
-		}
-	} else if('sharePhoneNumber' in message) {
-		m.protocolMessage = {
-			type: proto.Message.ProtocolMessage.Type.SHARE_PHONE_NUMBER
-		}
-	} else if('requestPhoneNumber' in message) {
-		m.requestPhoneNumberMessage = {}
-	} else {
-		m = await prepareWAMessageMedia(
-			message,
-			options
-		)
-	}
-
-	if('buttons' in message && !!message.buttons) {
-		const buttonsMessage: proto.Message.IButtonsMessage = {
-			buttons: message.buttons!.map(b => ({ ...b, type: proto.Message.ButtonsMessage.Button.Type.RESPONSE }))
-		}
-		if('text' in message) {
-			buttonsMessage.contentText = message.text
-			buttonsMessage.headerType = ButtonType.EMPTY
-		} else {
-			if('caption' in message) {
-				buttonsMessage.contentText = message.caption
-			}
-
-			const type = Object.keys(m)[0].replace('Message', '').toUpperCase()
-			buttonsMessage.headerType = ButtonType[type]
-
-			Object.assign(buttonsMessage, m)
-		}
-
-		if('footer' in message && !!message.footer) {
-			buttonsMessage.footerText = message.footer
-		}
-
-		m = { buttonsMessage }
-	} else if('templateButtons' in message && !!message.templateButtons) {
-		const msg: proto.Message.TemplateMessage.IHydratedFourRowTemplate = {
-			hydratedButtons: message.templateButtons
-		}
-
-		if('text' in message) {
-			msg.hydratedContentText = message.text
-		} else {
-
-			if('caption' in message) {
-				msg.hydratedContentText = message.caption
-			}
-
-			Object.assign(msg, m)
-		}
-
-		if('footer' in message && !!message.footer) {
-			msg.hydratedFooterText = message.footer
-		}
-
-		m = {
-			templateMessage: {
-				fourRowTemplate: msg,
-				hydratedTemplate: msg
-			}
-		}
-	}
-
-	if('sections' in message && !!message.sections) {
-		const listType = message.hasOwnProperty("listType") ? message.listType : proto.Message.ListMessage.ListType.PRODUCT_LIST
-		const listMessage: proto.Message.IListMessage = {
-			sections: message.sections,
-			buttonText: message.buttonText,
-			title: message.title,
-			footerText: message.footer,
-			description: message.text,
-			listType: listType
-		}
-
-		m = { listMessage }
-	}
-
-	if('viewOnce' in message && !!message.viewOnce) {
-		m = { viewOnceMessage: { message: m } }
-	}
-
-	if('mentions' in message && message.mentions?.length) {
-		const [messageType] = Object.keys(m)
-		m[messageType].contextInfo = m[messageType] || { }
-		m[messageType].contextInfo.mentionedJid = message.mentions
-	}
-
-	if('edit' in message) {
-		m = {
-			protocolMessage: {
-				key: message.edit,
-				editedMessage: m,
-				timestampMs: Date.now(),
-				type: WAProto.Message.ProtocolMessage.Type.MESSAGE_EDIT
-			}
-		}
-	}
-
-	if('contextInfo' in message && !!message.contextInfo) {
-		const [messageType] = Object.keys(m)
-		m[messageType] = m[messageType] || {}
-		m[messageType].contextInfo = message.contextInfo
-	}
-
-	return WAProto.Message.fromObject(m)
+    return WAProto.Message.fromObject(m)
 }
 
 export const generateWAMessageFromContent = (

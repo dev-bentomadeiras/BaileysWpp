@@ -150,7 +150,9 @@ export type AnyMediaMessageContent = (
         fileName?: string
         caption?: string
     } & Contextable & Buttonable & Templatable))
+    | ListMessage // Adicionando ListMessage aqui
     & { mimetype?: string } & Editable
+
 
 export type ButtonReplyInfo = {
     displayText: string
