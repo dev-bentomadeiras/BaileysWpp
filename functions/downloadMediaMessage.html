@@ -17,30 +17,25 @@
 <h1>Function downloadMediaMessage</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="downloadMediaMessage"><span class="tsd-kind-call-signature">download<wbr/>Media<wbr/>Message</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">Type</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span>, <span class="tsd-kind-parameter">type</span>, <span class="tsd-kind-parameter">options</span>, <span class="tsd-kind-parameter">ctx</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">Type</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">&quot;buffer&quot;</span><br/><span>    </span><span class="tsd-signature-symbol">? </span><span class="tsd-signature-type ">Buffer</span><br/><span>    </span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Transform</span><span class="tsd-signature-symbol">&gt;</span><a href="#downloadMediaMessage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="downloadMediaMessage"><span class="tsd-kind-call-signature">download<wbr/>Media<wbr/>Message</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span>, <span class="tsd-kind-parameter">type</span>, <span class="tsd-kind-parameter">options</span>, <span class="tsd-kind-parameter">ctx</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">Transform</span><span class="tsd-signature-symbol">&gt;</span><a href="#downloadMediaMessage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Downloads the given message. Throws an error if it&#39;s not a media message</p>
 </div>
-<section class="tsd-panel">
-<h4>Type Parameters</h4>
-<ul class="tsd-type-parameter-list">
-<li>
-<h4><span class="tsd-kind-type-parameter">Type</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">&quot;stream&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;buffer&quot;</span></h4></li></ul></section>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
 <h5><span class="tsd-kind-parameter">message</span>: <a href="../interfaces/proto.IWebMessageInfo.html" class="tsd-signature-type tsd-kind-interface">IWebMessageInfo</a></h5></li>
 <li>
-<h5><span class="tsd-kind-parameter">type</span>: <span class="tsd-signature-type tsd-kind-type-parameter">Type</span></h5></li>
+<h5><span class="tsd-kind-parameter">type</span>: <span class="tsd-signature-type">&quot;stream&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;buffer&quot;</span></h5></li>
 <li>
 <h5><span class="tsd-kind-parameter">options</span>: <a href="../types/MediaDownloadOptions.html" class="tsd-signature-type tsd-kind-type-alias">MediaDownloadOptions</a></h5></li>
 <li>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">ctx</span>: <span class="tsd-signature-type ">DownloadMediaMessageContext</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">Type</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">&quot;buffer&quot;</span><br/><span>    </span><span class="tsd-signature-symbol">? </span><span class="tsd-signature-type ">Buffer</span><br/><span>    </span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Transform</span><span class="tsd-signature-symbol">&gt;</span></h4>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">Transform</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/dev-bentomadeiras/BaileysWpp/blob/f6479f8/src/Utils/messages.ts#L879">src/Utils/messages.ts:879</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/dev-bentomadeiras/BaileysWpp/blob/af82b6f/src/Utils/messages.ts#L866">src/Utils/messages.ts:866</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -121,7 +116,6 @@
 <li><a href="../types/MessageContentGenerationOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Message<wbr/>Content<wbr/>Generation<wbr/>Options</span></a></li>
 <li><a href="../types/MessageGenerationOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Message<wbr/>Generation<wbr/>Options</span></a></li>
 <li><a href="../types/MessageGenerationOptionsFromContent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Message<wbr/>Generation<wbr/>Options<wbr/>From<wbr/>Content</span></a></li>
-<li><a href="../types/MessageInfoUpdate.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Message<wbr/>Info<wbr/>Update</span></a></li>
 <li><a href="../types/MessageReceiptType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Message<wbr/>Receipt<wbr/>Type</span></a></li>
 <li><a href="../types/MessageRelayOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Message<wbr/>Relay<wbr/>Options</span></a></li>
 <li><a href="../types/MessageType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4194304"></use></svg><span>Message<wbr/>Type</span></a></li>
@@ -366,7 +360,6 @@
 <li><a href="newLTHashState.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>newLTHash<wbr/>State</span></a></li>
 <li><a href="normalizeMessageContent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>normalize<wbr/>Message<wbr/>Content</span></a></li>
 <li><a href="parseAndInjectE2ESessions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>parse<wbr/>And<wbr/>Inject<wbr/>E2ESessions</span></a></li>
-<li><a href="patchMessageForMdIfRequired.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>patch<wbr/>Message<wbr/>For<wbr/>Md<wbr/>If<wbr/>Required</span></a></li>
 <li><a href="prepareDisappearingMessageSettingContent.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>prepare<wbr/>Disappearing<wbr/>Message<wbr/>Setting<wbr/>Content</span></a></li>
 <li><a href="prepareWAMessageMedia.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>prepareWAMessage<wbr/>Media</span></a></li>
 <li><a href="printQRIfNecessaryListener.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>printQRIf<wbr/>Necessary<wbr/>Listener</span></a></li>
