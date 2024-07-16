@@ -274,6 +274,9 @@ export type WAMessageUpdate = { update: Partial<WAMessage>, key: proto.IMessageK
 
 export type WAMessageCursor = { before: WAMessageKey | undefined } | { after: WAMessageKey | undefined }
 
+export type MessageInfoUpdate = { key: proto.IMessageKey, update: Partial<proto.IWebMessageInfo> }
+
+
 export type MessageUserReceiptUpdate = { key: proto.IMessageKey, receipt: MessageUserReceipt }
 
 export type MediaDecryptionKeyInfo = {
