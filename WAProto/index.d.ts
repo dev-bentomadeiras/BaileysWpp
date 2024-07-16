@@ -17075,7 +17075,7 @@ export namespace proto {
             productListInfo?: (proto.Message.ListMessage.IProductListInfo|null);
 
             /** ListMessage footerText */
-            footer?: (string|null);
+            footerText?: (string|null);
 
             /** ListMessage contextInfo */
             contextInfo?: (proto.IContextInfo|null);

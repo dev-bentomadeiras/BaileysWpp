@@ -83,8 +83,6 @@ type Listable = {
     /** Text of the bnutton on the list (required) */
     buttonText?: string
 }
-
-
 type WithDimensions = {
     width?: number
     height?: number
@@ -118,8 +116,6 @@ export type AnyMediaMessageContent = (
         caption?: string
         gifPlayback?: boolean
         jpegThumbnail?: string
-        /** if set to true, will send as a `video note` */
-        ptv?: boolean
     } & Mentionable & Contextable & Buttonable & Templatable & WithDimensions)
     | {
         audio: WAMediaUpload
@@ -137,10 +133,7 @@ export type AnyMediaMessageContent = (
         fileName?: string
         caption?: string
     } & Contextable & Buttonable & Templatable))
-    
-
     & { mimetype?: string } & Editable
-
 
 export type ButtonReplyInfo = {
     displayText: string
@@ -154,7 +147,7 @@ export type WASendableProduct = Omit<proto.Message.ProductMessage.IProductSnapsh
 
 export type AnyRegularMessageContent = (
     ({
-        text: string
+	    text: string
         linkPreview?: WAUrlInfo | null
     }
     & Mentionable & Contextable & Buttonable & Templatable & Listable & Editable)
@@ -178,7 +171,7 @@ export type AnyRegularMessageContent = (
     }
     | {
         listReply: Omit<proto.Message.IListResponseMessage, 'contextInfo'>
-    } 
+    }
     | {
         product: WASendableProduct
         businessOwnerJid?: string
@@ -188,13 +181,13 @@ export type AnyRegularMessageContent = (
 ) & ViewOnce
 
 export type AnyMessageContent = AnyRegularMessageContent | {
-    forward: WAMessage
-    force?: boolean
+	forward: WAMessage
+	force?: boolean
 } | {
     /** Delete your message or anyone's message in a group (admin required) */
-    delete: WAMessageKey
+	delete: WAMessageKey
 } | {
-    disappearingMessagesInChat: boolean | number
+	disappearingMessagesInChat: boolean | number
 }
 
 export type GroupMetadataParticipants = Pick<GroupMetadata, 'participants'>
@@ -232,8 +225,6 @@ export type MiscMessageGenerationOptions = MinimalRelayOptions & {
     backgroundColor?: string
     /** font type for status */
     font?: number
-    /** if it is broadcast */
-    broadcast?: boolean
 }
 export type MessageGenerationOptionsFromContent = MiscMessageGenerationOptions & {
 	userJid: string
@@ -273,9 +264,6 @@ export type MessageUserReceipt = proto.IUserReceipt
 export type WAMessageUpdate = { update: Partial<WAMessage>, key: proto.IMessageKey }
 
 export type WAMessageCursor = { before: WAMessageKey | undefined } | { after: WAMessageKey | undefined }
-
-export type MessageInfoUpdate = { key: proto.IMessageKey, update: Partial<proto.IWebMessageInfo> }
-
 
 export type MessageUserReceiptUpdate = { key: proto.IMessageKey, receipt: MessageUserReceipt }
 
