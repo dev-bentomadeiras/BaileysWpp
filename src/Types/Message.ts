@@ -47,6 +47,17 @@ export interface WAUrlInfo {
     originalThumbnailUrl?: string
 }
 
+interface ListMessage {
+    title?: string;
+    description?: string;
+    buttonText?: string;
+    listType?: proto.Message.ListMessage.ListType;
+    sections?: proto.Message.ListMessage.ISection[];
+    productListInfo?: proto.Message.ListMessage.IProductListInfo;
+    footerText?: string;
+    contextInfo?: proto.IContextInfo;
+}
+
 // types to generate WA messages
 type Mentionable = {
     /** list of jids that are mentioned in the accompanying text */
@@ -176,7 +187,7 @@ export type AnyRegularMessageContent = (
     }
     | {
         listReply: Omit<proto.Message.IListResponseMessage, 'contextInfo'>
-    }
+    } | ListMessage // Adicionando suporte para ListMessage
     | {
         product: WASendableProduct
         businessOwnerJid?: string
