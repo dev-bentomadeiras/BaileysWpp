@@ -776,12 +776,12 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				const response = await relayMessage(jid, fullMsg.message!, { messageId: fullMsg.key.id!, cachedGroupMetadata: options.cachedGroupMetadata, additionalAttributes, statusJidList: options.statusJidList })
 				logger.info({ event: 'message_sent', response });
 
-				// Captura o fullMsg no Sentry
-				Sentry.captureMessage('Message Sent', {
+				 // Captura o fullMsg no Sentry
+				 Sentry.captureMessage('Message Sent', {
 					level: 'info',
 					extra: {
-						fullMsg,
-						response
+						fullMsg: JSON.stringify(fullMsg, null, 2), // Converte o objeto em string JSON
+						response: JSON.stringify(response, null, 2) // Converte o objeto em string JSON
 					}
 				});
 
